@@ -1,0 +1,7 @@
+flask>=3.0.0
+requests>=2.31.0
+# Optional: uncomment for MySQL memory storage
+# mysql-connector-python>=8.0.0
+# Optional: for vector memory / RAG future extension
+# chromadb>=0.4.0
+# sentence-transformers>=2.2.0
