@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceAI — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#080808;--white:#f5f3ef;--surface:#161616;--surface2:#1e1e1e;--accent:#c8f03c;--accent2:#f0c83c;--muted:#777;--border:#222;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.news-bar{background:var(--accent);color:var(--black);padding:9px 0;overflow:hidden;position:relative;z-index:60;}
+.news-bar::before,.news-bar::after{content:'';position:absolute;top:0;width:80px;height:100%;z-index:2;}
+.news-bar::before{left:0;background:linear-gradient(to right,var(--accent),transparent);}
+.news-bar::after{right:0;background:linear-gradient(to left,var(--accent),transparent);}
+.news-track{display:flex;animation:ticker 50s linear infinite;white-space:nowrap;}
+.news-item{display:inline-flex;align-items:center;gap:8px;padding:0 32px;font-size:0.8rem;font-weight:500;}
+.ndot{width:5px;height:5px;background:rgba(0,0,0,0.35);border-radius:50%;}
+@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.news-bar:hover .news-track{animation-play-state:paused;}
+nav{background:rgba(8,8,8,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:62px;position:sticky;top:0;z-index:50;}
+.ham-btn{display:flex;align-items:center;gap:12px;cursor:pointer;background:none;border:none;color:var(--white);padding:8px 12px;border-radius:10px;transition:background 0.2s;margin-right:20px;}
+.ham-btn:hover{background:var(--surface2);}
+.ham-lines{display:flex;flex-direction:column;gap:5px;width:22px;}
+.ham-lines span{display:block;height:2px;background:var(--white);border-radius:2px;transition:all 0.3s;}
+.ham-btn.open .ham-lines span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+.ham-btn.open .ham-lines span:nth-child(2){opacity:0;transform:scaleX(0);}
+.ham-btn.open .ham-lines span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+.nav-dot{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.nav-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+.nav-links{display:flex;gap:4px;flex:1;}
+.nl{padding:7px 14px;border-radius:8px;font-size:0.83rem;color:var(--muted);cursor:pointer;transition:all 0.2s;text-decoration:none;}
+.nl:hover,.nl.active{color:var(--white);background:var(--surface2);}
+.nav-r{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.ava{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;color:var(--black);}
+.lout{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.8rem;}
+.lout:hover{border-color:#555;color:var(--white);}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:90;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.ov.open{opacity:1;pointer-events:all;}
+.smenu{position:fixed;top:0;left:0;height:100vh;width:320px;background:var(--surface);border-right:1px solid var(--border);z-index:95;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;overflow-y:auto;}
+.smenu.open{transform:translateX(0);}
+.smenu-hd{padding:26px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.smenu-brand{display:flex;align-items:center;gap:12px;}
+.smenu-logo{width:42px;height:42px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.smenu-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;}
+.smenu-tag{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+.smenu-close{background:var(--surface2);border:1px solid var(--border);color:var(--white);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;}
+.msec{padding:16px 14px 4px;}
+.msec-lbl{font-size:0.67rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px;padding:0 8px;}
+.mi{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;cursor:pointer;transition:all 0.2s;text-decoration:none;color:var(--white);margin-bottom:4px;border:1px solid transparent;}
+.mi:hover{background:var(--surface2);border-color:var(--border);color:var(--white);}
+.mi.act{background:rgba(200,240,60,0.07);border-color:rgba(200,240,60,0.18);}
+.mico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.cg{background:rgba(34,197,94,0.12);}.cb{background:rgba(59,130,246,0.12);}.cy{background:rgba(240,200,60,0.12);}.cp{background:rgba(168,85,247,0.12);}.co{background:rgba(249,115,22,0.12);}.cr{background:rgba(239,68,68,0.12);}
+.mi-nm{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;}
+.mi-ds{font-size:0.73rem;color:var(--muted);margin-top:1px;}
+.mi-ar{margin-left:auto;color:var(--muted);font-size:0.85rem;transition:transform 0.2s;}
+.mi:hover .mi-ar{color:var(--accent);transform:translateX(3px);}
+.mfoot{padding:14px;border-top:1px solid var(--border);margin-top:auto;}
+.mu{display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface2);border-radius:12px;}
+.mu-av{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--black);font-size:0.9rem;}
+.mu-nm{font-weight:600;font-size:0.85rem;}
+.mu-em{font-size:0.7rem;color:var(--muted);}
+.mu-lo{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:0.73rem;}
+.mu-lo:hover{border-color:var(--red);color:var(--red);}
+.sec{padding:52px 48px;max-width:1400px;margin:0 auto;}
+.sec-lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:6px;}
+.sec-ttl{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px;}
+.sec-sub{color:var(--muted);font-size:0.85rem;}
+.sec-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;}
+.see-all{color:var(--muted);font-size:0.79rem;text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:2px;white-space:nowrap;}
+.see-all:hover{color:var(--white);}
+.hero{padding:62px 48px 46px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1400px;margin:0 auto;}
+.hgr{font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:14px;}
+.htitle{font-family:'Syne',sans-serif;font-size:3.1rem;font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:18px;}
+.htitle .out{-webkit-text-stroke:1.5px var(--white);color:transparent;}
+.hsub{color:var(--muted);font-size:0.91rem;line-height:1.7;max-width:440px;margin-bottom:28px;}
+.hcta{display:flex;gap:12px;}
+.btn-m{background:var(--accent);color:var(--black);border:none;padding:13px 26px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.btn-m:hover{background:#d4f54a;transform:translateY(-2px);}
+.btn-g{background:none;border:1px solid var(--border);color:var(--white);padding:13px 26px;border-radius:12px;font-size:0.88rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;}
+.btn-g:hover{border-color:#555;}
+.hvis{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.hcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;}
+.hcard.big{grid-column:1/-1;background:var(--accent);color:var(--black);}
+.hl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;}
+.hcard.big .hl{color:rgba(0,0,0,0.5);}
+.hv{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;}
+.hch{font-size:0.76rem;margin-top:4px;}
+.up{color:var(--green);}.hcard.big .up{color:rgba(0,0,0,0.55);}
+.mbars{height:42px;display:flex;align-items:flex-end;gap:3px;margin-top:10px;}
+.mb{flex:1;border-radius:2px 2px 0 0;background:rgba(0,0,0,0.18);}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.tc{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-decoration:none;color:var(--white);display:block;}
+.tc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% -10%,rgba(200,240,60,0.07),transparent 65%);opacity:0;transition:opacity 0.3s;}
+.tc:hover{border-color:rgba(200,240,60,0.35);transform:translateY(-4px);color:var(--white);}
+.tc:hover::before{opacity:1;}
+.tc.wide{grid-column:1/3;}
+.tico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;}
+.ib{background:rgba(59,130,246,0.12);}.iy{background:rgba(240,200,60,0.12);}.ir{background:rgba(239,68,68,0.12);}.ig{background:rgba(34,197,94,0.12);}.io{background:rgba(249,115,22,0.12);}
+.tn{font-family:'Syne',sans-serif;font-weight:700;font-size:0.94rem;margin-bottom:5px;}
+.td{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+.tbadge{position:absolute;top:16px;right:16px;background:rgba(200,240,60,0.1);color:var(--accent);border:1px solid rgba(200,240,60,0.2);padding:2px 8px;border-radius:20px;font-size:0.66rem;font-weight:600;}
+.tarr{position:absolute;bottom:20px;right:20px;color:var(--muted);font-size:0.95rem;transition:all 0.2s;}
+.tc:hover .tarr{color:var(--accent);transform:translate(2px,-2px);}
+.chatbox{background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;display:grid;grid-template-columns:230px 1fr;}
+.csb{border-right:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:5px;background:rgba(0,0,0,0.2);}
+.csb h4{font-size:0.64rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin:6px 0 4px;padding:0 4px;}
+.qq{background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:9px 11px;border-radius:9px;cursor:pointer;font-size:0.75rem;text-align:left;transition:all 0.2s;width:100%;line-height:1.4;}
+.qq:hover{border-color:rgba(200,240,60,0.3);color:var(--accent);}
+.cmain{display:flex;flex-direction:column;max-height:490px;}
+.ctop{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.cav{width:32px;height:32px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.cnm{font-family:'Syne',sans-serif;font-weight:700;font-size:0.86rem;}
+.cst{font-size:0.7rem;color:var(--green);}
+.ofbtn{margin-left:auto;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:8px 13px;border-radius:9px;cursor:pointer;font-size:0.74rem;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all 0.2s;}
+.ofbtn:hover{border-color:var(--accent);color:var(--accent);}
+.cmsgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:270px;}
+.msg{max-width:76%;animation:fadeUp 0.25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.msg.bot{align-self:flex-start;}.msg.user{align-self:flex-end;}
+.mb2{padding:11px 15px;border-radius:14px;font-size:0.85rem;line-height:1.62;white-space:pre-wrap;}
+.msg.bot .mb2{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px;}
+.msg.user .mb2{background:var(--accent);color:var(--black);font-weight:500;border-bottom-right-radius:4px;}
+.mtime{font-size:0.67rem;color:var(--muted);margin-top:4px;padding:0 3px;}
+.msg.user .mtime{text-align:right;}
+.tdots{display:flex;gap:4px;padding:10px 14px;}
+.tdots span{width:7px;height:7px;background:var(--muted);border-radius:50%;animation:bounce 1.2s infinite;}
+.tdots span:nth-child(2){animation-delay:.2s;}.tdots span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-7px);}}
+.cinp{padding:12px 15px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;}
+.cinp input{flex:1;background:var(--black);border:1px solid var(--border);color:var(--white);padding:10px 14px;border-radius:10px;font-size:0.85rem;font-family:'DM Sans',sans-serif;}
+.cinp input:focus{outline:none;border-color:var(--accent);}
+.cinp input::placeholder{color:#444;}
+.bsend{background:var(--accent);color:var(--black);border:none;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:16px;flex-shrink:0;}
+.bsend:hover{background:#d4f54a;}
+.bclr{background:none;border:1px solid var(--border);color:var(--muted);width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:14px;flex-shrink:0;}
+.bclr:hover{border-color:var(--red);color:var(--red);}
+.bwrap{display:grid;grid-template-columns:270px 1fr;background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;height:450px;}
+.blp{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.blh{padding:13px 15px;border-bottom:1px solid var(--border);}
+.bsrch{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:9px 12px;border-radius:9px;font-size:0.8rem;font-family:'DM Sans',sans-serif;}
+.bsrch:focus{outline:none;border-color:var(--accent);}
+.fpills{display:flex;gap:5px;margin-top:9px;}
+.pill{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:20px;font-size:0.68rem;cursor:pointer;transition:all 0.2s;}
+.pill.active,.pill:hover{background:rgba(200,240,60,0.09);border-color:rgba(200,240,60,0.3);color:var(--accent);}
+.bscroll{flex:1;overflow-y:auto;padding:9px;}
+.bitem{display:flex;align-items:flex-start;gap:9px;padding:11px;border-radius:11px;cursor:pointer;transition:all 0.2s;border:1px solid transparent;margin-bottom:5px;}
+.bitem:hover,.bitem.sel{background:var(--surface2);border-color:var(--border);}
+.bitem.sel{border-color:rgba(200,240,60,0.25);}
+.blogo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.sbi{background:#1a3a6e;}.hdfc{background:#004c8c;}.icici{background:#b02a37;}.axis{background:#97144d;}.pnb{background:#002244;}.kotak{background:#e4002b;}
+.bnm{font-weight:600;font-size:0.82rem;}
+.bds{font-size:0.69rem;color:var(--muted);margin-top:1px;}
+.btags{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;}
+.btag{background:rgba(255,255,255,0.05);color:var(--muted);padding:2px 6px;border-radius:7px;font-size:0.62rem;}
+.bopen{color:var(--green);font-size:0.68rem;font-weight:700;margin-left:auto;flex-shrink:0;margin-top:2px;}
+.bclosed{color:var(--red);font-size:0.68rem;font-weight:700;margin-left:auto;flex-shrink:0;margin-top:2px;}
+.mapp{position:relative;background:#0d1117;}
+.mapp iframe{width:100%;height:100%;border:none;filter:saturate(0.65) contrast(0.85);}
+.mchip{position:absolute;top:14px;left:14px;background:rgba(8,8,8,0.88);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:12px;padding:11px 15px;}
+.mchip-t{font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;}
+.mchip-s{font-size:0.7rem;color:var(--muted);margin-top:2px;}
+.locfab{position:absolute;bottom:14px;right:14px;background:var(--accent);color:var(--black);border:none;padding:9px 15px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.77rem;cursor:pointer;}
+.locfab:hover{background:#d4f54a;}
+.bchip{position:absolute;bottom:14px;left:14px;right:110px;background:rgba(8,8,8,0.92);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;padding:12px;display:none;animation:fadeUp 0.2s ease;}
+.bchip.show{display:flex;gap:10px;align-items:center;}
+.bcl{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.bcnm{font-family:'Syne',sans-serif;font-weight:700;font-size:0.83rem;}
+.bcin{font-size:0.71rem;color:var(--muted);margin-top:2px;}
+.bcrt{margin-left:auto;text-align:right;flex-shrink:0;}
+.bcrt .rv{font-family:'Syne',sans-serif;font-weight:800;font-size:0.94rem;color:var(--accent);}
+.bcrt .rl{font-size:0.65rem;color:var(--muted);}
+.ngrid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:18px;}
+.ngrid2{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px;}
+.nc{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.3s;text-decoration:none;color:var(--white);display:block;}
+.nc:hover{border-color:rgba(200,240,60,0.3);transform:translateY(-3px);color:var(--white);}
+.ni{display:flex;align-items:center;justify-content:center;font-size:2.6rem;}
+.ni.h180{height:180px;}.ni.h140{height:140px;}
+.n1{background:linear-gradient(135deg,#0a1628,#1a3a6e);}.n2{background:linear-gradient(135deg,#1a0a0a,#6e1a1a);}.n3{background:linear-gradient(135deg,#0a1a0a,#1a4a1a);}
+.n4{background:linear-gradient(135deg,#1a1a0a,#5a4a00);}.n5{background:linear-gradient(135deg,#0a0a1a,#1a1a6e);}.n6{background:linear-gradient(135deg,#1a0a1a,#5a1a5a);}
+.nbody{padding:15px;}
+.ntag{display:inline-block;background:rgba(200,240,60,0.1);color:var(--accent);padding:3px 9px;border-radius:20px;font-size:0.65rem;margin-bottom:7px;text-transform:uppercase;letter-spacing:0.06em;}
+.nhl{font-family:'Syne',sans-serif;font-weight:700;font-size:0.86rem;line-height:1.3;margin-bottom:6px;}
+.nex{font-size:0.75rem;color:var(--muted);line-height:1.53;margin-bottom:8px;}
+.nmt{display:flex;justify-content:space-between;font-size:0.67rem;color:var(--muted);}
+footer{border-top:1px solid var(--border);padding:24px 48px;display:flex;justify-content:space-between;align-items:center;margin-top:20px;}
+.fbr{font-family:'Syne',sans-serif;font-weight:800;font-size:0.94rem;}
+.fls{display:flex;gap:18px;}
+.fls a{font-size:0.77rem;color:var(--muted);text-decoration:none;}
+.fls a:hover{color:var(--white);}
+.fcp{font-size:0.75rem;color:var(--muted);}
+@media(max-width:1200px){.tgrid{grid-template-columns:repeat(2,1fr);}.tc.wide{grid-column:1/3;}.ngrid{grid-template-columns:1fr 1fr;}.ngrid2{grid-template-columns:1fr 1fr;}}
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding:38px 22px;}.hvis{display:none;}.chatbox{grid-template-columns:1fr;}.csb{display:none;}.bwrap{grid-template-columns:1fr;height:auto;}.mapp{height:290px;}.sec{padding:34px 20px;}.ngrid,.ngrid2{grid-template-columns:1fr;}}
+@media(max-width:640px){.tgrid{grid-template-columns:1fr 1fr;}.tc.wide{grid-column:1/-1;}.smenu{width:100%;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="news-bar">
+  <div class="news-track">
+    <span class="news-item"><span class="ndot"></span>📈 Sensex rises 312 pts — Nifty above 24,500</span>
+    <span class="news-item"><span class="ndot"></span>🏦 RBI holds repo rate at 6.5% for 7th consecutive time</span>
+    <span class="news-item"><span class="ndot"></span>💰 Gold hits ₹72,450 per 10g — highest in 2026</span>
+    <span class="news-item"><span class="ndot"></span>📊 India GDP growth at 7.2% for FY2025-26</span>
+    <span class="news-item"><span class="ndot"></span>🏠 Home loan rates drop to 8.35% — SBI leads</span>
+    <span class="news-item"><span class="ndot"></span>💵 USD/INR at 83.42 — Rupee gains on GDP data</span>
+    <span class="news-item"><span class="ndot"></span>📈 SIP inflows hit record ₹26,000 Cr in Feb 2026</span>
+    <span class="news-item"><span class="ndot"></span>🚗 Auto FDI hits $2.3B in Q1 2026</span>
+    <span class="news-item"><span class="ndot"></span>📈 Sensex rises 312 pts — Nifty above 24,500</span>
+    <span class="news-item"><span class="ndot"></span>🏦 RBI holds repo rate at 6.5% for 7th consecutive time</span>
+    <span class="news-item"><span class="ndot"></span>💰 Gold hits ₹72,450 per 10g — highest in 2026</span>
+    <span class="news-item"><span class="ndot"></span>📊 India GDP growth at 7.2% for FY2025-26</span>
+    <span class="news-item"><span class="ndot"></span>🏠 Home loan rates drop to 8.35% — SBI leads</span>
+    <span class="news-item"><span class="ndot"></span>💵 USD/INR at 83.42 — Rupee gains on GDP data</span>
+    <span class="news-item"><span class="ndot"></span>📈 SIP inflows hit record ₹26,000 Cr in Feb 2026</span>
+    <span class="news-item"><span class="ndot"></span>🚗 Auto FDI hits $2.3B in Q1 2026</span>
+  </div>
+</div>
+
+<nav>
+  <button class="ham-btn" id="hamBtn" onclick="toggleMenu()">
+    <div class="ham-lines"><span></span><span></span><span></span></div>
+    <div class="nav-dot">💰</div>
+    <span class="nav-name">FinanceAI</span>
+  </button>
+  <div class="nav-links">
+    <a class="nl active" href="#home">Home</a>
+    <a class="nl" href="#tools">Tools</a>
+    <a class="nl" href="#chat">AI Chat</a>
+    <a class="nl" href="#banks">Banks</a>
+    <a class="nl" href="#news">News</a>
+  </div>
+  <div class="nav-r">
+    <div class="ava">K</div>
+    <button class="lout" onclick="location.href='/login'">Log out</button>
+  </div>
+</nav>
+
+<div class="ov" id="ov" onclick="closeMenu()"></div>
+<div class="smenu" id="smenu">
+  <div class="smenu-hd">
+    <div class="smenu-brand">
+      <div class="smenu-logo">💰</div>
+      <div><div class="smenu-name">FinanceAI</div><div class="smenu-tag">AI Finance Advisor</div></div>
+    </div>
+    <button class="smenu-close" onclick="closeMenu()">✕</button>
+  </div>
+  <div class="msec">
+    <div class="msec-lbl">Home</div>
+    <a class="mi act" href="/home"><div class="mico cg">🏠</div><div><div class="mi-nm">Dashboard</div><div class="mi-ds">Chat, Banks & News</div></div><span class="mi-ar">→</span></a>
+  </div>
+  <div class="msec">
+    <div class="msec-lbl">Financial Tools — Separate Pages</div>
+    <a class="mi" href="/credit"><div class="mico cb">📊</div><div><div class="mi-nm">Credit Score</div><div class="mi-ds">CIBIL score estimator</div></div><span class="mi-ar">→</span></a>
+    <a class="mi" href="/loan"><div class="mico cy">🏦</div><div><div class="mi-nm">Loan Predictor</div><div class="mi-ds">Eligibility & EMI calculator</div></div><span class="mi-ar">→</span></a>
+    <a class="mi" href="/risk"><div class="mico cr">⚠️</div><div><div class="mi-nm">Risk Analysis</div><div class="mi-ds">Debt trap & crisis detection</div></div><span class="mi-ar">→</span></a>
+    <a class="mi" href="/investment"><div class="mico cg">📈</div><div><div class="mi-nm">Investment Advisor</div><div class="mi-ds">Smart fund allocation</div></div><span class="mi-ar">→</span></a>
+    <a class="mi" href="/analyzer"><div class="mico co">🔍</div><div><div class="mi-nm">Full Analyzer</div><div class="mi-ds">Complete financial health</div></div><span class="mi-ar">→</span></a>
+  </div>
+  <div class="msec">
+    <div class="msec-lbl">On This Page</div>
+    <a class="mi" href="#chat" onclick="closeMenu()"><div class="mico cb">🤖</div><div><div class="mi-nm">AI Chat</div><div class="mi-ds">Chat with Llama3 locally</div></div><span class="mi-ar">↓</span></a>
+    <a class="mi" href="#banks" onclick="closeMenu()"><div class="mico cp">📍</div><div><div class="mi-nm">Nearby Banks</div><div class="mi-ds">Map & bank list</div></div><span class="mi-ar">↓</span></a>
+    <a class="mi" href="#news" onclick="closeMenu()"><div class="mico cy">📰</div><div><div class="mi-nm">Finance News</div><div class="mi-ds">Market updates</div></div><span class="mi-ar">↓</span></a>
+  </div>
+  <div class="mfoot">
+    <div class="mu">
+      <div class="mu-av">K</div>
+      <div><div class="mu-nm">Kumar Singh</div><div class="mu-em">kumar@financeai.local</div></div>
+      <button class="mu-lo" onclick="location.href='/login'">Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="hero" id="home">
+  <div>
+    <div class="hgr">Good morning, 👋</div>
+    <h1 class="htitle">Your Smart<br><span class="out">Finance</span><br>Assistant.</h1>
+    <p class="hsub">AI-powered financial advisor running fully offline. Monitor spending, detect risks, plan investments — all private and local on your PC.</p>
+    <div class="hcta">
+      <a class="btn-m" href="#chat">Chat with AI →</a>
+      <a class="btn-g" href="/analyzer">Full Analysis</a>
+    </div>
+  </div>
+  <div class="hvis">
+    <div class="hcard big"><div class="hl">Total Savings</div><div class="hv">₹3,84,575</div><div class="hch up">↑ 7.4% this month</div><div class="mbars"><div class="mb" style="height:30%"></div><div class="mb" style="height:50%"></div><div class="mb" style="height:42%"></div><div class="mb" style="height:68%"></div><div class="mb" style="height:58%"></div><div class="mb" style="height:82%"></div><div class="mb" style="height:74%"></div><div class="mb" style="height:90%"></div></div></div>
+    <div class="hcard"><div class="hl">Monthly EMI</div><div class="hv" style="font-size:1.5rem">₹12,000</div><div class="hch" style="color:var(--muted)">Stable</div></div>
+    <div class="hcard"><div class="hl">Health Score</div><div class="hv" style="font-size:1.5rem">82/100</div><div class="hch up">Excellent 🟢</div></div>
+  </div>
+</div>
+
+<div class="sec" id="tools">
+  <div class="sec-hd"><div><div class="sec-lbl">Financial Tools</div><div class="sec-ttl">Dedicated Analysis Pages</div><div class="sec-sub">Click any tool — each opens its own full dedicated page</div></div></div>
+  <div class="tgrid">
+    <a class="tc" href="/credit"><div class="tico ib">📊</div><div class="tn">Credit Score</div><div class="td">Estimate your CIBIL score using income, EMIs, and payment history.</div><div class="tarr">↗</div></a>
+    <a class="tc" href="/loan"><div class="tico iy">🏦</div><div class="tn">Loan Predictor</div><div class="td">Check home, car, or personal loan eligibility and calculate EMI.</div><div class="tarr">↗</div></a>
+    <a class="tc" href="/risk"><div class="tico ir">⚠️</div><div class="tn">Risk Analysis</div><div class="td">Detect debt traps, crisis signals, and vulnerabilities early.</div><div class="tbadge">Important</div><div class="tarr">↗</div></a>
+    <a class="tc" href="/investment"><div class="tico ig">📈</div><div class="tn">Investment Advisor</div><div class="td">Smart fund allocation — SIP, PPF, ELSS based on your profile.</div><div class="tarr">↗</div></a>
+    <a class="tc wide" href="/analyzer"><div class="tico io">🔍</div><div class="tn">Full Financial Analyzer</div><div class="td">Complete health check — DTI, savings rate, emergency fund, income breakdown, warnings and AI recommendations all in one page.</div><div class="tbadge">All-in-One</div><div class="tarr">↗</div></a>
+  </div>
+</div>
+
+<div class="sec" id="chat">
+  <div class="sec-hd"><div><div class="sec-lbl">AI Advisor</div><div class="sec-ttl">Chat with FinanceAI</div><div class="sec-sub">Ask anything in natural language — powered by local Llama3 running on your PC</div></div><a class="see-all" href="chat.html">Open full screen →</a></div>
+  <div class="chatbox">
+    <div class="csb">
+      <h4>Quick Questions</h4>
+      <button class="qq" onclick="ask('My salary is ₹50,000 and EMI is ₹15,000. Is my DTI safe?')">💬 Is my DTI safe?</button>
+      <button class="qq" onclick="ask('Can I get a ₹20 lakh home loan with salary ₹60,000?')">🏠 Home loan check</button>
+      <button class="qq" onclick="ask('Where to invest ₹10,000/month as a beginner?')">📈 Investment advice</button>
+      <button class="qq" onclick="ask('How to improve my CIBIL score quickly?')">📊 Improve credit</button>
+      <button class="qq" onclick="ask('What are signs of a debt trap?')">⚠️ Debt trap signs</button>
+      <button class="qq" onclick="ask('Explain SIP vs PPF vs ELSS.')">💡 SIP vs PPF vs ELSS</button>
+      <h4>Go to Tool</h4>
+      <button class="qq" onclick="location.href='/credit'">📊 Credit Score Page →</button>
+      <button class="qq" onclick="location.href='/loan'">🏦 Loan Predictor →</button>
+      <button class="qq" onclick="location.href='/risk'">⚠️ Risk Analysis →</button>
+    </div>
+    <div class="cmain">
+      <div class="ctop">
+        <div class="cav">🤖</div>
+        <div><div class="cnm">FinanceAI Advisor</div><div class="cst">● Online — Llama3 Local</div></div>
+        <a class="ofbtn" href="chat.html">⛶ Full Screen</a>
+      </div>
+      <div class="cmsgs" id="cmsgs">
+        <div class="msg bot"><div class="mb2">Hello! 👋 I'm your AI financial advisor running locally on your PC. Ask me anything about loans, investments, EMI, savings, or credit. How can I help today?</div><div class="mtime">Now</div></div>
+      </div>
+      <div class="cinp">
+        <input type="text" id="ci" placeholder="Ask about loans, investments, savings..." onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="bclr" onclick="clearChat()" title="Clear">🗑</button>
+        <button class="bsend" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="banks">
+  <div class="sec-hd"><div><div class="sec-lbl">Location Services</div><div class="sec-ttl">Nearby Banks & ATMs</div><div class="sec-sub">Find banks near your location — click to see details</div></div><div style="display:flex;gap:10px;align-items:center;"><button class="btn-m" onclick="locateUser()" style="padding:9px 16px;font-size:0.78rem;">📍 My Location</button><a class="see-all" href="banks.html">Full page →</a></div></div>
+  <div class="bwrap">
+    <div class="blp">
+      <div class="blh">
+        <input class="bsrch" placeholder="🔍 Search banks..." oninput="filterBanks(this.value)"/>
+        <div class="fpills">
+          <button class="pill active" onclick="setFilter('all',this)">All</button>
+          <button class="pill" onclick="setFilter('open',this)">Open</button>
+          <button class="pill" onclick="setFilter('atm',this)">ATM</button>
+          <button class="pill" onclick="setFilter('loan',this)">Loans</button>
+        </div>
+      </div>
+      <div class="bscroll" id="blist"></div>
+    </div>
+    <div class="mapp">
+     <iframe id="mf"
+  src="https://www.openstreetmap.org/export/embed.html?bbox=76.80,30.68,76.90,30.75&layer=mapnik&marker=30.712,76.854"
+  style="width:100%; height:100%; border:none;">
+</iframe>
+      <div class="mchip"><div class="mchip-t" id="mt">📍Khanpur, Punjab</div><div class="mchip-s" id="ms">6 banks found nearby</div></div>
+      <button class="locfab" onclick="locateUser()">📍 Update Location</button>
+      <div class="bchip" id="bchip">
+        <div class="bcl" id="bcl"></div>
+        <div style="flex:1;min-width:0"><div class="bcnm" id="bcnm"></div><div class="bcin" id="bcin"></div></div>
+        <div class="bcrt"><div class="rv" id="bcrv"></div><div class="rl">Loan Rate</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec" id="news">
+  <div class="sec-hd"><div><div class="sec-lbl">Finance News</div><div class="sec-ttl">Market & Finance Updates</div><div class="sec-sub">Latest news affecting your financial decisions</div></div><a href="#" class="see-all">View all →</a></div>
+  <div class="ngrid">
+    <a class="nc" href="#"><div class="ni h180 n1">📈</div><div class="nbody"><div class="ntag">Markets</div><div class="nhl">Sensex Rallies 312 Points as FII Inflows Surge to ₹8,200 Crore</div><div class="nex">Foreign institutional investors turned net buyers as RBI's steady rate stance boosted confidence across banking and IT sectors.</div><div class="nmt"><span>Apr 13, 2026</span><span>3 min read</span></div></div></a>
+    <a class="nc" href="#"><div class="ni h140 n2">🏦</div><div class="nbody"><div class="ntag">RBI Policy</div><div class="nhl">RBI Keeps Repo Rate at 6.5% — Inflation in Focus</div><div class="nex">MPC voted 5-1 to hold rates. Home loan EMIs remain unchanged for borrowers.</div><div class="nmt"><span>Apr 10, 2026</span><span>2 min read</span></div></div></a>
+    <a class="nc" href="#"><div class="ni h140 n3">💹</div><div class="nbody"><div class="ntag">Investing</div><div class="nhl">SIP Inflows Hit Record ₹26,000 Crore in February 2026</div><div class="nex">Retail investor participation through SIPs reached an all-time high across India.</div><div class="nmt"><span>Apr 8, 2026</span><span>2 min read</span></div></div></a>
+  </div>
+  <div class="ngrid2">
+    <a class="nc" href="#"><div class="ni h140 n4">🥇</div><div class="nbody"><div class="ntag">Commodities</div><div class="nhl">Gold Hits ₹72,450 per 10g — Should You Invest Now?</div><div class="nex">Experts suggest Sovereign Gold Bonds over physical gold for better tax benefits and safety.</div><div class="nmt"><span>Apr 7, 2026</span><span>2 min read</span></div></div></a>
+    <a class="nc" href="#"><div class="ni h140 n5">🏠</div><div class="nbody"><div class="ntag">Real Estate</div><div class="nhl">Home Loan Rates Drop to 8.35% — Best Time to Buy?</div><div class="nex">SBI and HDFC slash rates. First-time buyers could save ₹3–5 lakh over the loan tenure.</div><div class="nmt"><span>Apr 5, 2026</span><span>3 min read</span></div></div></a>
+    <a class="nc" href="#"><div class="ni h140 n6">💵</div><div class="nbody"><div class="ntag">Currency</div><div class="nhl">Rupee Strengthens to 83.42 vs Dollar on GDP Numbers</div><div class="nex">India's 7.2% GDP projection for FY26 boosted the rupee, potentially making imports cheaper.</div><div class="nmt"><span>Apr 3, 2026</span><span>2 min read</span></div></div></a>
+  </div>
+</div>
+
+<footer>
+  <div class="fbr">💰 FinanceAI</div>
+  <div class="fls"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Disclaimer</a><a href="#">Support</a></div>
+  <div class="fcp">© 2026 FinanceAI. Fully Local. No Cloud.</div>
+</footer>
+
+<script>
+async function loadNews(){
+  const container = document.querySelector('.ngrid');
+
+  try{
+    container.innerHTML = "⏳ Loading finance news...";
+
+    const res = await fetch('/api/news');
+    const data = await res.json();
+
+    console.log("News API:", data); // debug
+
+    // ✅ Check if API failed
+    if(!data.articles){
+      container.innerHTML = "❌ API error or no news available";
+      return;
+    }
+
+    container.innerHTML = '';
+
+    data.articles.slice(0,6).forEach(n => {
+      container.innerHTML += `
+        <a class="nc" href="${n.url}" target="_blank">
+          <div class="ni h140">📈</div>
+          <div class="nbody">
+            <div class="ntag">Finance</div>
+            <div class="nhl">${n.title}</div>
+            <div class="nex">${n.description || 'No description'}</div>
+          </div>
+        </a>
+      `;
+    });
+
+  }catch(err){
+    console.error("News error:", err);
+    container.innerHTML = "⚠️ Failed to load news. Check backend/API.";
+  }
+}
+function updateBankDistances(lat, lon){
+  BK.forEach(b => {
+    // random distance simulation
+    b.d = (Math.random() * 3).toFixed(1);
+  });
+
+  renderBanks(getFiltered());
+}
+function toggleMenu(){const o=document.getElementById('smenu').classList.toggle('open');document.getElementById('ov').classList.toggle('open',o);document.getElementById('hamBtn').classList.toggle('open',o);document.body.style.overflow=o?'hidden':'';}
+function closeMenu(){['smenu','ov'].forEach(id=>document.getElementById(id).classList.remove('open'));document.getElementById('hamBtn').classList.remove('open');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
+window.addEventListener('scroll',()=>{const ids=['home','tools','chat','banks','news'];let c='home';ids.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-100)c=id;});document.querySelectorAll('.nl').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+c));});
+function ask(q){document.getElementById('ci').value=q;sendChat();}
+async function sendChat(){const inp=document.getElementById('ci');const t=inp.value.trim();if(!t)return;addMsg('user',t);inp.value='';const ty=showTyping();try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})});const d=await r.json();ty.remove();addMsg('bot',d.response||'Sorry, could not process that.');}catch{ty.remove();addMsg('bot','Cannot reach Flask backend.\nRun: python app.py\nAlso ensure Ollama is running.');}}
+function addMsg(role,text){const m=document.getElementById('cmsgs');const d=document.createElement('div');d.className='msg '+role;const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});d.innerHTML=`<div class="mb2">${esc(text)}</div><div class="mtime">${t}</div>`;m.appendChild(d);m.scrollTop=m.scrollHeight;return d;}
+function showTyping(){const m=document.getElementById('cmsgs');const d=document.createElement('div');d.className='msg bot';d.innerHTML=`<div class="mb2" style="padding:8px 14px"><div class="tdots"><span></span><span></span><span></span></div></div>`;m.appendChild(d);m.scrollTop=m.scrollHeight;return d;}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function clearChat(){document.getElementById('cmsgs').innerHTML=`<div class="msg bot"><div class="mb2">Chat cleared! Ask me anything.</div><div class="mtime">Now</div></div>`;fetch('/api/clear',{method:'POST'}).catch(()=>{});}
+const BK=[{id:1,n:'HDFC Bank',l:'🏛',c:'HDFC',d:1.0,o:true,a:'Khanpur, Shibzada Ajit Singh Nagar, Punjab',tags:['Home Loans','FD','ATM'],r:'8.4%',atm:true},{id:2,n:'Bank of Baroda',l:'🏦',c:'BoB',d:1.0,o:true,a:'Bhago Majra,Punjab',tags:['Personal Loan','Credit Card'],r:'10.75%',atm:true},{id:3,n:'Bank of Baroda',l:'💳',c:'BoB',d:1.2,o:false,a:'Nh21 Khanpur,kharar, Punjab',tags:['Investment','MF','ATM'],r:'10.99%',atm:true},{id:4,n:'Axis Bank',l:'✅',c:'axis',d:1.5,o:true,a:'Kharar, Punjab',tags:['Auto Loan','Savings'],r:'11.25%',atm:true},{id:5,n:'Punjab National Bank',l:'🏛',c:'pnb',d:1.9,o:true,a:'Kharar, Punjab',tags:['Agri Loan','PPF'],r:'8.9%',atm:false},{id:6,n:'Canara Bank',l:'🔵',c:'Canra',d:2.4,o:false,a:'Kharar, Punjab',tags:['Digital Account','MF'],r:'10.99%',atm:true}];
+let af='all',sid=null;
+function renderBanks(list){document.getElementById('blist').innerHTML=list.map(b=>`<div class="bitem${sid===b.id?' sel':''}" onclick="selB(${b.id})"><div class="blogo ${b.c}">${b.l}</div><div style="flex:1;min-width:0"><div class="bnm">${b.n}</div><div class="bds">📍 ${b.d} km — ${b.a}</div><div class="btags">${b.tags.map(t=>`<span class="btag">${t}</span>`).join('')}</div></div><span class="${b.o?'bopen':'bclosed'}">${b.o?'Open':'Closed'}</span></div>`).join('');}
+function selB(id){sid=id;const b=BK.find(x=>x.id===id);const c=document.getElementById('bchip');document.getElementById('bcl').className=`bcl ${b.c}`;document.getElementById('bcl').textContent=b.l;document.getElementById('bcnm').textContent=b.n;document.getElementById('bcin').textContent=`${b.d} km · ${b.a} · ${b.o?'Open ✅':'Closed 🔴'}`;document.getElementById('bcrv').textContent=b.r;c.classList.add('show');renderBanks(getFiltered());}
+function setFilter(f,el){af=f;document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');renderBanks(getFiltered());}
+function filterBanks(q){renderBanks(BK.filter(b=>b.n.toLowerCase().includes(q.toLowerCase())||b.tags.some(t=>t.toLowerCase().includes(q.toLowerCase()))));}
+function getFiltered(){if(af==='open')return BK.filter(b=>b.o);if(af==='atm')return BK.filter(b=>b.atm);if(af==='loan')return BK.filter(b=>b.tags.some(t=>t.toLowerCase().includes('loan')));return BK;}
+function locateUser(){
+  if(!navigator.geolocation){
+    alert('Geolocation not supported');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (p) => {
+      const { latitude: la, longitude: lo } = p.coords;
+
+      console.log("Location:", la, lo);
+
+      // ✅ Update map
+      document.getElementById('mf').src =
+        `https://www.openstreetmap.org/export/embed.html?bbox=${lo-0.05},${la-0.05},${lo+0.05},${la+0.05}&layer=mapnik&marker=${la},${lo}`;
+
+      // ✅ Update text
+      document.getElementById('mt').textContent = '📍 Khanpur, Punjab';
+      document.getElementById('ms').textContent = 'Showing banks near you';
+
+      // 🔥 ADD THIS LINE (MOST IMPORTANT)
+      updateBankDistances(la, lo);
+
+    },
+    (error) => {
+      alert("Location blocked or not available");
+      console.error(error);
+    }
+  );
+}
+loadNews();
+</script>
+</body>
+</html>

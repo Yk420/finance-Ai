@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceAI — Loan Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#080808;--white:#f5f3ef;--surface:#161616;--surface2:#1e1e1e;--accent:#c8f03c;--accent2:#f0c83c;--muted:#777;--border:#222;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.topbar{background:rgba(8,8,8,0.97);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;}
+.back-btn{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;text-decoration:none;transition:all 0.2s;}
+.back-btn:hover{border-color:#555;color:var(--white);}
+.page-icon{width:32px;height:32px;background:rgba(240,200,60,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+.page-sub{font-size:0.78rem;color:var(--muted);margin-left:4px;}
+
+.container{max-width:1100px;margin:0 auto;padding:40px 32px;}
+.ph-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:8px;}
+.ph-title{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
+.ph-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px;}
+
+.main-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:24px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:22px;display:flex;align-items:center;gap:8px;}
+
+/* LOAN TYPE SELECTOR */
+.loan-types{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px;}
+.lt-btn{background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:12px;border-radius:12px;cursor:pointer;text-align:center;transition:all 0.2s;}
+.lt-btn:hover,.lt-btn.active{background:rgba(200,240,60,0.08);border-color:rgba(200,240,60,0.4);color:var(--accent);}
+.lt-btn .lt-icon{font-size:1.4rem;display:block;margin-bottom:4px;}
+.lt-btn .lt-name{font-family:'Syne',sans-serif;font-size:0.8rem;font-weight:700;}
+.lt-btn .lt-rate{font-size:0.7rem;color:var(--muted);}
+.lt-btn.active .lt-rate{color:rgba(200,240,60,0.7);}
+
+/* SLIDERS */
+.rg{margin-bottom:22px;}
+.rg-head{display:flex;justify-content:space-between;margin-bottom:10px;}
+.rg-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);}
+.rg-val{font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;color:var(--accent);}
+input[type=range]{width:100%;-webkit-appearance:none;height:5px;background:var(--surface2);border-radius:3px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 0 3px rgba(200,240,60,0.15);}
+.btn-calc{width:100%;background:var(--accent);color:var(--black);border:none;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;margin-top:8px;transition:all 0.2s;}
+.btn-calc:hover{background:#d4f54a;transform:translateY(-1px);}
+
+/* ELIGIBILITY BAR */
+.elig-section{margin-bottom:24px;}
+.elig-label{display:flex;justify-content:space-between;margin-bottom:8px;}
+.elig-title{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);}
+.elig-status{font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;}
+.elig-bar{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin-bottom:6px;}
+.elig-fill{height:100%;border-radius:5px;background:linear-gradient(to right,var(--red),var(--yellow),var(--green));transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.elig-range{display:flex;justify-content:space-between;font-size:0.68rem;color:var(--muted);}
+
+/* RESULTS GRID */
+.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.r-item{background:var(--surface2);border-radius:12px;padding:16px;}
+.r-item.highlight{background:var(--accent);color:var(--black);}
+.r-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;}
+.r-item.highlight .r-label{color:rgba(0,0,0,0.5);}
+.r-val{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;}
+
+/* AMORTIZATION */
+.amort-preview{margin-top:20px;}
+.amort-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:0.82rem;}
+.amort-row:last-child{border:none;}
+.amort-row .yr{color:var(--muted);width:60px;flex-shrink:0;}
+.amort-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.amort-bar-p{height:100%;background:var(--accent);border-radius:3px;}
+.amort-bar-i{height:100%;background:var(--red);border-radius:3px;margin-top:-6px;}
+.amort-vals{width:120px;text-align:right;flex-shrink:0;}
+
+.rec-box{background:var(--surface2);border-radius:12px;padding:16px;font-size:0.85rem;line-height:1.6;grid-column:1/-1;}
+
+/* BANK RATE TABLE */
+.rates-card{margin-top:24px;grid-column:1/-1;}
+.rate-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);}
+.rate-row:last-child{border:none;}
+.bank-name{font-weight:600;font-size:0.88rem;width:150px;}
+.rate-val{font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);width:80px;}
+.rate-proc{font-size:0.78rem;color:var(--muted);}
+.rate-bar{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;}
+.rate-fill{height:100%;background:var(--accent);border-radius:2px;}
+
+@media(max-width:900px){.main-grid{grid-template-columns:1fr;}.loan-types{grid-template-columns:repeat(4,1fr);}.results-grid{grid-template-columns:1fr 1fr;}.rates-card{grid-column:1;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="/home">← Back</a>
+  <div class="page-icon">🏦</div>
+  <span class="page-title">Loan Eligibility Predictor</span>
+  <span class="page-sub">— powered by loan_engine.py</span>
+</div>
+
+<div class="container">
+  <div class="ph-label">Loan Analysis</div>
+  <div class="ph-title">Check Your Loan Eligibility</div>
+  <div class="ph-sub">Slide the values to instantly see your eligibility, EMI, and AI recommendation</div>
+
+  <div class="main-grid">
+    <!-- FORM -->
+    <div class="card">
+      <div class="card-title">🏦 Select Loan Type</div>
+      <div class="loan-types">
+        <button class="lt-btn" onclick="setLoan(this,'8.5')" data-rate="8.5">
+          <span class="lt-icon">🏠</span><div class="lt-name">Home Loan</div><div class="lt-rate">@ 8.5% p.a.</div>
+        </button>
+        <button class="lt-btn active" onclick="setLoan(this,'14')" data-rate="14">
+          <span class="lt-icon">💳</span><div class="lt-name">Personal Loan</div><div class="lt-rate">@ 14% p.a.</div>
+        </button>
+        <button class="lt-btn" onclick="setLoan(this,'9.5')" data-rate="9.5">
+          <span class="lt-icon">🚗</span><div class="lt-name">Car Loan</div><div class="lt-rate">@ 9.5% p.a.</div>
+        </button>
+        <button class="lt-btn" onclick="setLoan(this,'9')" data-rate="9">
+          <span class="lt-icon">🎓</span><div class="lt-name">Education</div><div class="lt-rate">@ 9% p.a.</div>
+        </button>
+      </div>
+
+      <div class="rg">
+        <div class="rg-head"><span class="rg-label">Monthly Income</span><span class="rg-val" id="v-income">₹50,000</span></div>
+        <input type="range" id="r-income" min="10000" max="500000" step="5000" value="50000" oninput="upd('income',this.value)"/>
+      </div>
+      <div class="rg">
+        <div class="rg-head"><span class="rg-label">Existing Monthly EMIs</span><span class="rg-val" id="v-emi">₹8,000</span></div>
+        <input type="range" id="r-emi" min="0" max="200000" step="1000" value="8000" oninput="upd('emi',this.value)"/>
+      </div>
+      <div class="rg">
+        <div class="rg-head"><span class="rg-label">Loan Amount Needed</span><span class="rg-val" id="v-loan">₹10,00,000</span></div>
+        <input type="range" id="r-loan" min="50000" max="10000000" step="50000" value="1000000" oninput="upd('loan',this.value)"/>
+      </div>
+      <div class="rg">
+        <div class="rg-head"><span class="rg-label">Loan Tenure</span><span class="rg-val" id="v-tenure">60 months</span></div>
+        <input type="range" id="r-tenure" min="12" max="360" step="12" value="60" oninput="upd('tenure',this.value)"/>
+      </div>
+      <button class="btn-calc" onclick="calcLoan()">📊 Calculate Eligibility</button>
+    </div>
+
+    <!-- RESULT -->
+    <div>
+      <div class="card">
+        <div class="card-title">📊 Eligibility Result</div>
+        <div class="elig-section">
+          <div class="elig-label">
+            <span class="elig-title">Eligibility Score</span>
+            <span class="elig-status" id="eligStatus">—</span>
+          </div>
+          <div class="elig-bar"><div class="elig-fill" id="eligFill" style="width:0%"></div></div>
+          <div class="elig-range"><span>Not Eligible</span><span>Borderline</span><span>Fully Eligible</span></div>
+        </div>
+
+        <div class="results-grid">
+          <div class="r-item highlight"><div class="r-label">Monthly EMI</div><div class="r-val" id="res-emi">—</div></div>
+          <div class="r-item"><div class="r-label">Max Eligible Loan</div><div class="r-val" id="res-max">—</div></div>
+          <div class="r-item"><div class="r-label">Interest Rate</div><div class="r-val" id="res-rate">—</div></div>
+          <div class="r-item"><div class="r-label">DTI After Loan</div><div class="r-val" id="res-dti">—</div></div>
+          <div class="r-item"><div class="r-label">Total Interest Paid</div><div class="r-val" id="res-interest">—</div></div>
+          <div class="r-item"><div class="r-label">Total Amount Paid</div><div class="r-val" id="res-total">—</div></div>
+          <div class="rec-box" id="res-rec">Click Calculate Eligibility to see your personalized AI recommendation.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANK RATES TABLE -->
+    <div class="card rates-card">
+      <div class="card-title">🏛️ Current Bank Loan Rates (2025)</div>
+      <div id="ratesTable"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentRate=14;
+const bankRates={
+  '8.5':[{b:'SBI',r:8.4,p:'0.5%'},{b:'HDFC Bank',r:8.5,p:'0.5%'},{b:'ICICI Bank',r:8.75,p:'0.5%'},{b:'Axis Bank',r:8.9,p:'1%'},{b:'Kotak Bank',r:9.0,p:'0.5%'}],
+  '14':[{b:'HDFC Bank',r:10.75,p:'2.5%'},{b:'ICICI Bank',r:10.99,p:'2%'},{b:'Axis Bank',r:11.25,p:'1.5%'},{b:'Bajaj Finance',r:13.0,p:'1%'},{b:'SBI',r:12.3,p:'1%'}],
+  '9.5':[{b:'SBI',r:8.65,p:'0.5%'},{b:'HDFC Bank',r:8.75,p:'0.5%'},{b:'ICICI Bank',r:9.0,p:'0.5%'},{b:'Axis Bank',r:9.25,p:'0.75%'},{b:'Kotak Bank',r:9.5,p:'0.5%'}],
+  '9':[{b:'SBI',r:8.05,p:'0%'},{b:'PNB',r:8.15,p:'0%'},{b:'Canara Bank',r:8.1,p:'0%'},{b:'HDFC Bank',r:9.5,p:'1%'},{b:'ICICI Bank',r:9.75,p:'1%'}]
+};
+
+function setLoan(el,rate){
+  document.querySelectorAll('.lt-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  currentRate=+rate;
+  renderRates(rate);
+  calcLoan();
+}
+function renderRates(rate){
+  const rates=bankRates[rate]||[];
+  const minR=Math.min(...rates.map(r=>r.r));
+  const maxR=Math.max(...rates.map(r=>r.r));
+  document.getElementById('ratesTable').innerHTML=rates.map(r=>`
+    <div class="rate-row">
+      <div class="bank-name">${r.b}</div>
+      <div class="rate-val">${r.r}%</div>
+      <div class="rate-bar"><div class="rate-fill" style="width:${((r.r-minR)/(maxR-minR+0.01))*100}%"></div></div>
+      <div class="rate-proc">Processing: ${r.p}</div>
+    </div>`).join('');
+}
+function fmt(n){if(n>=10000000)return '₹'+(n/10000000).toFixed(1)+'Cr';if(n>=100000)return '₹'+(n/100000).toFixed(1)+'L';if(n>=1000)return '₹'+(n/1000).toFixed(0)+'K';return '₹'+Math.round(n);}
+function upd(type,val){
+  val=+val;
+  if(type==='income')document.getElementById('v-income').textContent='₹'+val.toLocaleString();
+  if(type==='emi')document.getElementById('v-emi').textContent='₹'+val.toLocaleString();
+  if(type==='loan')document.getElementById('v-loan').textContent=fmt(val);
+  if(type==='tenure')document.getElementById('v-tenure').textContent=val+' months';
+  calcLoan();
+}
+function calcLoan(){
+  const income=+document.getElementById('r-income').value;
+  const existEmi=+document.getElementById('r-emi').value;
+  const loanAmt=+document.getElementById('r-loan').value;
+  const tenure=+document.getElementById('r-tenure').value;
+  const rate=currentRate;
+  const mr=rate/12/100;
+  const maxEmi=income*0.4;
+  const availEmi=Math.max(0,maxEmi-existEmi);
+  const maxLoan=availEmi>0&&mr>0?availEmi*((Math.pow(1+mr,tenure)-1)/(mr*Math.pow(1+mr,tenure))):0;
+  const reqEmi=loanAmt>0&&mr>0?loanAmt*(mr*Math.pow(1+mr,tenure)/(Math.pow(1+mr,tenure)-1)):0;
+  const totalPaid=reqEmi*tenure;
+  const totalInterest=totalPaid-loanAmt;
+  const newDti=((existEmi+reqEmi)/income)*100;
+  const eligible=availEmi>0&&loanAmt<=maxLoan;
+  const eligPct=Math.min(100,Math.max(0,(maxLoan/(loanAmt||1))*70));
+
+  document.getElementById('eligFill').style.width=eligPct+'%';
+  document.getElementById('eligStatus').textContent=eligible?'✅ Eligible':'❌ Not Eligible';
+  document.getElementById('eligStatus').style.color=eligible?'var(--green)':'var(--red)';
+  document.getElementById('res-emi').textContent='₹'+Math.round(reqEmi).toLocaleString();
+  document.getElementById('res-max').textContent=fmt(Math.round(maxLoan));
+  document.getElementById('res-rate').textContent=rate+'% p.a.';
+  document.getElementById('res-dti').textContent=newDti.toFixed(1)+'%';
+  document.getElementById('res-interest').textContent=fmt(Math.round(totalInterest));
+  document.getElementById('res-total').textContent=fmt(Math.round(totalPaid));
+
+  let rec='';
+  if(!eligible)rec=`❌ Not eligible. Your existing EMIs leave only ₹${Math.round(availEmi).toLocaleString()} available. Max loan you can get: ${fmt(Math.round(maxLoan))}. Pay down existing debt first.`;
+  else if(newDti>50)rec=`⚠️ Technically eligible but DTI of ${newDti.toFixed(0)}% is very high. Consider reducing loan amount to ${fmt(Math.round(maxLoan*0.7))} for safer repayment.`;
+  else if(newDti>40)rec=`🟡 Eligible but borderline. DTI of ${newDti.toFixed(0)}% is above 40%. Only proceed if income is stable and no new expenses are expected.`;
+  else rec=`✅ Comfortably eligible! DTI of ${newDti.toFixed(0)}% is within safe limits. Compare rates across banks before deciding — even 0.5% difference saves ${fmt(Math.round(totalInterest*0.1))} over the loan term.`;
+  document.getElementById('res-rec').textContent=rec;
+}
+// Init
+renderRates('14');
+calcLoan();
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceAI — Credit Score</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#080808;--white:#f5f3ef;--surface:#161616;--surface2:#1e1e1e;--accent:#c8f03c;--muted:#777;--border:#222;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.topbar{background:rgba(8,8,8,0.97);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;}
+.back-btn{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;text-decoration:none;transition:all 0.2s;}
+.back-btn:hover{border-color:#555;color:var(--white);}
+.page-icon{width:32px;height:32px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+.page-sub{font-size:0.78rem;color:var(--muted);margin-left:4px;}
+
+.container{max-width:1100px;margin:0 auto;padding:40px 32px;}
+.page-header{margin-bottom:36px;}
+.ph-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:8px;}
+.ph-title{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
+.ph-sub{color:var(--muted);font-size:0.9rem;}
+
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+
+/* FORM */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.ig{margin-bottom:18px;}
+.ig label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;}
+.ig input,.ig select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:12px 14px;border-radius:10px;font-size:0.88rem;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+.ig input:focus,.ig select:focus{outline:none;border-color:var(--accent);}
+.ig select option{background:var(--surface2);}
+.ig-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.btn-calc{width:100%;background:var(--accent);color:var(--black);border:none;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s;margin-top:4px;}
+.btn-calc:hover{background:#d4f54a;transform:translateY(-1px);}
+
+/* RESULT */
+.score-center{text-align:center;padding:20px 0 24px;}
+.score-ring-wrap{position:relative;width:180px;height:180px;margin:0 auto 16px;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--surface2);stroke-width:14;}
+.ring-fg{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1),stroke 0.5s;}
+.score-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-num{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;line-height:1;}
+.score-lbl{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;}
+.score-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px;}
+.score-likelihood{font-size:0.82rem;color:var(--muted);max-width:260px;margin:0 auto;}
+
+.score-bands{display:flex;margin:20px 0;border-radius:8px;overflow:hidden;height:8px;}
+.band{flex:1;}
+.band.b1{background:#ef4444;}
+.band.b2{background:#f97316;}
+.band.b3{background:#f59e0b;}
+.band.b4{background:#84cc16;}
+.band.b5{background:#22c55e;}
+.band-labels{display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted);margin-top:6px;}
+
+.breakdown-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.bk-item{background:var(--surface2);border-radius:10px;padding:12px;}
+.bk-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:4px;}
+.bk-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+
+/* TIPS */
+.tips-card{margin-top:24px;}
+.tip-item{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);font-size:0.85rem;line-height:1.5;}
+.tip-item:last-child{border:none;}
+.tip-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.tip-text{color:#ccc;}
+
+/* SCORE RANGES TABLE */
+.ranges-card{margin-top:24px;grid-column:1/-1;}
+.range-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);}
+.range-row:last-child{border:none;}
+.range-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.range-score{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;width:100px;}
+.range-label{font-weight:600;font-size:0.88rem;width:100px;}
+.range-desc{font-size:0.8rem;color:var(--muted);}
+.disclaimer{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px 16px;font-size:0.8rem;color:#f59e0b;margin-top:20px;line-height:1.5;}
+
+@media(max-width:768px){.main-grid{grid-template-columns:1fr;}.ig-row{grid-template-columns:1fr;}.ranges-card{grid-column:1;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="/home">← Back</a>
+  <div class="page-icon">📊</div>
+  <span class="page-title">Credit Score Estimator</span>
+  <span class="page-sub">— powered by credit_engine.py</span>
+</div>
+
+<div class="container">
+  <div class="page-header">
+    <div class="ph-label">Credit Analysis</div>
+    <div class="ph-title">Estimate Your Credit Score</div>
+    <div class="ph-sub">Enter your financial details to get an AI-estimated CIBIL score with personalized improvement tips</div>
+  </div>
+
+  <div class="main-grid">
+    <!-- FORM -->
+    <div class="card">
+      <div class="card-title">📋 Your Financial Profile</div>
+      <div class="ig-row">
+        <div class="ig"><label>Monthly Income (₹)</label><input type="number" id="c-income" placeholder="60000" value="60000"/></div>
+        <div class="ig"><label>Total Monthly EMIs (₹)</label><input type="number" id="c-emi" placeholder="15000" value="15000"/></div>
+      </div>
+      <div class="ig-row">
+        <div class="ig"><label>Monthly Savings (₹)</label><input type="number" id="c-savings" placeholder="10000" value="10000"/></div>
+        <div class="ig"><label>Missed Payments (12mo)</label><input type="number" id="c-missed" placeholder="0" value="0" min="0"/></div>
+      </div>
+      <div class="ig-row">
+        <div class="ig"><label>Credit Card Utilization (%)</label><input type="number" id="c-util" placeholder="25" value="25" min="0" max="100"/></div>
+        <div class="ig"><label>Years of Credit History</label><input type="number" id="c-years" placeholder="3" value="3" min="0"/></div>
+      </div>
+      <div class="ig">
+        <label>Loan Repayment Track Record</label>
+        <select id="c-track">
+          <option value="good">Always on time ✅</option>
+          <option value="mostly">Mostly on time 🟡</option>
+          <option value="poor">Frequent delays 🔴</option>
+        </select>
+      </div>
+      <button class="btn-calc" onclick="calcCredit()">🔍 Estimate My Credit Score</button>
+
+     
+    </div>
+
+    <!-- RESULT -->
+    <div>
+      <div class="card">
+        <div class="card-title">📊 Score Result</div>
+        <div class="score-center">
+          <div class="score-ring-wrap">
+            <svg viewBox="0 0 180 180" width="180" height="180">
+              <circle class="ring-bg" cx="90" cy="90" r="76"/>
+              <circle class="ring-fg" id="ringFg" cx="90" cy="90" r="76"
+                stroke="#c8f03c" stroke-dasharray="478" stroke-dashoffset="478"/>
+            </svg>
+            <div class="score-inner">
+              <div class="score-num" id="scoreNum">—</div>
+              <div class="score-lbl">/ 900</div>
+            </div>
+          </div>
+          <div class="score-name" id="scoreName">Enter your details</div>
+          <div class="score-likelihood" id="scoreLikelihood">Click Estimate to see your credit score prediction</div>
+        </div>
+        <div class="score-bands">
+          <div class="band b1"></div><div class="band b2"></div><div class="band b3"></div><div class="band b4"></div><div class="band b5"></div>
+        </div>
+        <div class="band-labels"><span>300 Poor</span><span>500</span><span>650</span><span>750</span><span>900 Excellent</span></div>
+        <div class="breakdown-grid" id="breakdown">
+          <div class="bk-item"><div class="bk-label">DTI Ratio</div><div class="bk-val" id="bk-dti">—</div></div>
+          <div class="bk-item"><div class="bk-label">Savings Rate</div><div class="bk-val" id="bk-sr">—</div></div>
+          <div class="bk-item"><div class="bk-label">Missed Payments</div><div class="bk-val" id="bk-mp">—</div></div>
+          <div class="bk-item"><div class="bk-label">Card Utilization</div><div class="bk-val" id="bk-cu">—</div></div>
+        </div>
+      </div>
+
+      <div class="card tips-card">
+        <div class="card-title">💡 Improvement Tips</div>
+        <div id="tipsContainer">
+          <div class="tip-item"><div class="tip-icon">📋</div><div class="tip-text">Enter your details and click Estimate to get personalized credit improvement tips.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCORE RANGES TABLE -->
+    <div class="card ranges-card">
+      <div class="card-title">📖 CIBIL Score Ranges Explained</div>
+      <div class="range-row"><div class="range-dot" style="background:#22c55e"></div><div class="range-score">750 – 900</div><div class="range-label" style="color:#22c55e">Excellent</div><div class="range-desc">Best interest rates, instant approval from all lenders. You're a preferred borrower.</div></div>
+      <div class="range-row"><div class="range-dot" style="background:#84cc16"></div><div class="range-score">700 – 749</div><div class="range-label" style="color:#84cc16">Good</div><div class="range-desc">Approved by most banks at competitive rates. Minor improvements will unlock best rates.</div></div>
+      <div class="range-row"><div class="range-dot" style="background:#f59e0b"></div><div class="range-score">650 – 699</div><div class="range-label" style="color:#f59e0b">Fair</div><div class="range-desc">Some lenders may approve at higher interest. Improve before applying for large loans.</div></div>
+      <div class="range-row"><div class="range-dot" style="background:#f97316"></div><div class="range-score">550 – 649</div><div class="range-label" style="color:#f97316">Poor</div><div class="range-desc">Limited options. May need co-applicant or collateral. Focus on repayment first.</div></div>
+      <div class="range-row"><div class="range-dot" style="background:#ef4444"></div><div class="range-score">300 – 549</div><div class="range-label" style="color:#ef4444">Very Poor</div><div class="range-desc">Loan approval unlikely. Requires serious credit rehabilitation over 12–24 months.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function calcCredit(){
+  const income=+document.getElementById('c-income').value||0;
+  const emi=+document.getElementById('c-emi').value||0;
+  const savings=+document.getElementById('c-savings').value||0;
+  const missed=+document.getElementById('c-missed').value||0;
+  const util=+document.getElementById('c-util').value||0;
+  const years=+document.getElementById('c-years').value||0;
+  const track=document.getElementById('c-track').value;
+
+  let score=650;
+  const dti=income>0?(emi/income)*100:0;
+  const sr=income>0?(savings/income)*100:0;
+
+  if(dti<20)score+=80;else if(dti<30)score+=50;else if(dti<40)score+=20;else if(dti<50)score-=30;else score-=80;
+  if(sr>30)score+=50;else if(sr>20)score+=30;else if(sr>10)score+=10;else if(sr<5)score-=30;
+  if(missed===0)score+=70;else if(missed<=2)score-=40;else if(missed<=5)score-=100;else score-=150;
+  if(track==='poor')score-=50;else if(track==='mostly')score-=20;
+  if(util<30)score+=40;else if(util<50)score+=10;else if(util<75)score-=30;else score-=70;
+  if(years>5)score+=30;else if(years>2)score+=10;
+  score=Math.max(300,Math.min(900,score));
+
+  // Animate ring
+  const pct=(score-300)/600;
+  const fg=document.getElementById('ringFg');
+  fg.style.strokeDashoffset=478-(478*pct);
+  fg.style.stroke=score>=750?'#22c55e':score>=700?'#84cc16':score>=650?'#f59e0b':score>=550?'#f97316':'#ef4444';
+
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('bk-dti').textContent=dti.toFixed(1)+'%';
+  document.getElementById('bk-sr').textContent=sr.toFixed(1)+'%';
+  document.getElementById('bk-mp').textContent=missed+' times';
+  document.getElementById('bk-cu').textContent=util+'%';
+
+  let name='',likelihood='';
+  if(score>=800){name='Excellent 🟢';likelihood='Very High — Top lenders will offer you their best interest rates immediately.';}
+  else if(score>=750){name='Very Good 🟢';likelihood='High — Most banks will approve loans at competitive rates.';}
+  else if(score>=700){name='Good 🟡';likelihood='Moderate — Likely approved but may get slightly higher interest rates.';}
+  else if(score>=650){name='Fair 🟠';likelihood='Low-Moderate — Some lenders may approve with conditions or higher rates.';}
+  else if(score>=550){name='Poor 🔴';likelihood='Low — Difficult to get unsecured loans. Need 6–12 months of improvement.';}
+  else{name='Very Poor ⛔';likelihood='Very Low — Focus on credit rehabilitation before applying for any loan.';}
+
+  document.getElementById('scoreName').textContent=name;
+  document.getElementById('scoreLikelihood').textContent=likelihood;
+
+  // Tips
+  const tips=[];
+  if(missed>0)tips.push({i:'🔑',t:'Set up auto-pay for all EMIs and credit cards — missed payments damage credit most.'});
+  if(dti>35)tips.push({i:'💳',t:'Pay down existing debt. Debt-to-income ratio of '+dti.toFixed(0)+'% is above the safe 30% threshold.'});
+  if(util>30)tips.push({i:'📉',t:'Reduce credit card usage to below 30% of limit. Current '+util+'% is hurting your score.'});
+  if(sr<10)tips.push({i:'💰',t:'Increase your monthly savings — low savings indicates financial stress to lenders.'});
+  if(years<2)tips.push({i:'📅',t:'Keep old credit accounts open to build credit history. Length matters for your score.'});
+  if(score<700)tips.push({i:'🏦',t:'Consider a secured credit card or fixed deposit-backed loan to build positive history.'});
+  tips.push({i:'📋',t:'Check your official CIBIL score for free once a year at cibil.com or via your bank app.'});
+
+  document.getElementById('tipsContainer').innerHTML=tips.map(t=>`<div class="tip-item"><div class="tip-icon">${t.i}</div><div class="tip-text">${t.t}</div></div>`).join('');
+}
+</script>
+</body>
+</html>

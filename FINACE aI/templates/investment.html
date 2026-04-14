@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceAI — Investment Advisor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#080808;--white:#f5f3ef;--surface:#161616;--surface2:#1e1e1e;--accent:#c8f03c;--muted:#777;--border:#222;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;--purple:#a855f7;}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.topbar{background:rgba(8,8,8,0.97);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;}
+.back-btn{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;text-decoration:none;transition:all 0.2s;}
+.back-btn:hover{border-color:#555;color:var(--white);}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+.page-sub{font-size:0.78rem;color:var(--muted);margin-left:4px;}
+.page-icon{width:32px;height:32px;background:rgba(34,197,94,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+
+.container{max-width:1200px;margin:0 auto;padding:40px 32px;}
+.ph-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--green);margin-bottom:8px;}
+.ph-title{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
+.ph-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px;}
+
+/* RISK PROFILE */
+.risk-profiles{display:flex;gap:12px;margin-bottom:32px;}
+.rp-btn{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--white);padding:16px 12px;border-radius:14px;cursor:pointer;text-align:center;transition:all 0.2s;}
+.rp-btn:hover{border-color:rgba(200,240,60,0.3);}
+.rp-btn.active{background:rgba(200,240,60,0.08);border-color:rgba(200,240,60,0.4);}
+.rp-icon{font-size:1.6rem;margin-bottom:6px;}
+.rp-name{font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:3px;}
+.rp-desc{font-size:0.72rem;color:var(--muted);}
+
+/* INPUT ROW */
+.input-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;}
+.input-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.ic-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;}
+.ic-input{width:100%;background:var(--black);border:1px solid var(--border);color:var(--white);padding:11px 14px;border-radius:10px;font-size:1rem;font-family:'Syne',sans-serif;font-weight:700;transition:border-color 0.2s;}
+.ic-input:focus{outline:none;border-color:var(--accent);}
+.btn-calc{width:100%;background:var(--accent);color:var(--black);border:none;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:all 0.2s;}
+.btn-calc:hover{background:#d4f54a;transform:translateY(-1px);}
+
+/* ALLOCATION DONUT */
+.alloc-section{display:grid;grid-template-columns:280px 1fr;gap:24px;margin-bottom:24px;align-items:start;}
+.donut-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;text-align:center;}
+.donut-wrap{position:relative;width:200px;height:200px;margin:0 auto 20px;}
+.donut-wrap svg{transform:rotate(-90deg);}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.donut-total{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;}
+.donut-lbl{font-size:0.7rem;color:var(--muted);margin-top:2px;}
+.legend{display:flex;flex-direction:column;gap:8px;text-align:left;}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:0.82rem;}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+
+/* INVESTMENT CARDS */
+.investments-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.inv-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;transition:all 0.3s;}
+.inv-card:hover{border-color:rgba(200,240,60,0.3);transform:translateY(-3px);}
+.inv-card.priority-1{border-color:rgba(200,240,60,0.3);background:rgba(200,240,60,0.04);}
+.inv-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.inv-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.inv-priority{font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;}
+.inv-p1{background:rgba(200,240,60,0.12);color:var(--accent);}
+.inv-p2{background:rgba(59,130,246,0.12);color:var(--blue);}
+.inv-p3{background:rgba(168,85,247,0.12);color:var(--purple);}
+.inv-p4{background:rgba(245,158,11,0.12);color:var(--yellow);}
+.inv-name{font-family:'Syne',sans-serif;font-weight:700;font-size:0.92rem;margin-bottom:6px;}
+.inv-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+.inv-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.inv-stat{background:var(--surface2);border-radius:8px;padding:9px;}
+.is-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:3px;}
+.is-val{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;}
+.inv-amount{background:rgba(200,240,60,0.08);border:1px solid rgba(200,240,60,0.2);border-radius:8px;padding:10px;margin-top:10px;text-align:center;}
+.inv-amount .amt-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent);}
+.inv-amount .amt-label{font-size:0.7rem;color:var(--muted);}
+.inv-reason{font-size:0.75rem;color:#999;margin-top:8px;font-style:italic;}
+
+/* WEALTH PROJECTION */
+.projection-card{margin-top:24px;}
+.proj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+.proj-item{background:var(--surface2);border-radius:12px;padding:16px;text-align:center;}
+.proj-year{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:6px;}
+.proj-val{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent);}
+.proj-bar{height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden;}
+.proj-fill{height:100%;background:var(--accent);border-radius:3px;}
+
+.disclaimer{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px 16px;font-size:0.8rem;color:var(--yellow);margin-top:24px;line-height:1.5;}
+@media(max-width:1000px){.investments-grid{grid-template-columns:1fr 1fr;}.alloc-section{grid-template-columns:1fr;}.proj-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.input-row{grid-template-columns:1fr;}.risk-profiles{flex-direction:column;}.investments-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="/home">← Back</a>
+  <div class="page-icon">📈</div>
+  <span class="page-title">Investment Advisor</span>
+  <span class="page-sub">— powered by investment_engine.py</span>
+</div>
+
+<div class="container">
+  <div class="ph-label">Investment Planning</div>
+  <div class="ph-title">Smart Investment Advisor</div>
+  <div class="ph-sub">Get personalized fund allocation based on your income, savings, and risk tolerance</div>
+
+  <!-- Risk Profile -->
+  <div class="risk-profiles">
+    <button class="rp-btn" onclick="setRisk('conservative',this)">
+      <div class="rp-icon">🛡️</div><div class="rp-name">Conservative</div><div class="rp-desc">Safety first, stable returns</div>
+    </button>
+    <button class="rp-btn active" onclick="setRisk('moderate',this)">
+      <div class="rp-icon">⚖️</div><div class="rp-name">Moderate</div><div class="rp-desc">Balanced growth & safety</div>
+    </button>
+    <button class="rp-btn" onclick="setRisk('aggressive',this)">
+      <div class="rp-icon">🚀</div><div class="rp-name">Aggressive</div><div class="rp-desc">Max growth, higher risk</div>
+    </button>
+  </div>
+
+  <!-- Inputs -->
+  <div class="input-row">
+    <div class="input-card"><div class="ic-label">Monthly Income (₹)</div><input class="ic-input" id="i-income" type="number" value="60000" placeholder="60000" oninput="calcInvest()"/></div>
+    <div class="input-card"><div class="ic-label">Monthly Savings Available (₹)</div><input class="ic-input" id="i-savings" type="number" value="12000" placeholder="12000" oninput="calcInvest()"/></div>
+    <div class="input-card"><div class="ic-label">Investment Horizon</div>
+      <select class="ic-input" id="i-horizon" onchange="calcInvest()" style="cursor:pointer;">
+        <option value="3">Short (1-3 yrs)</option>
+        <option value="7" selected>Medium (5-7 yrs)</option>
+        <option value="15">Long (10-15 yrs)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Allocation + Recommendations -->
+  <div class="alloc-section">
+    <div class="donut-card">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:16px;">Allocation Strategy</div>
+      <div class="donut-wrap">
+        <svg viewBox="0 0 200 200" width="200" height="200" id="donutSvg"></svg>
+        <div class="donut-center">
+          <div class="donut-total" id="donutTotal">₹0</div>
+          <div class="donut-lbl">/ month</div>
+        </div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:16px;">📋 Recommended Investments</div>
+      <div class="investments-grid" id="invGrid"></div>
+    </div>
+  </div>
+
+  <!-- Wealth Projection -->
+  <div class="card projection-card">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:4px;">📊 Wealth Projection (SIP Growth)</div>
+    <div style="font-size:0.8rem;color:var(--muted);">Estimated portfolio value if you invest consistently</div>
+    <div class="proj-grid" id="projGrid"></div>
+  </div>
+
+ 
+
+<script>
+let riskProfile='moderate';
+const COLORS=['#c8f03c','#3b82f6','#a855f7','#f59e0b','#22c55e','#f97316'];
+
+const INVESTMENTS={
+  conservative:{
+    alloc:[{n:'Liquid Fund / FD',pct:35,icon:'🏦',bg:'rgba(34,197,94,0.12)',ret:'6-7%',risk:'Very Low',liq:'High'},{n:'PPF / NSC',pct:30,icon:'🏛️',bg:'rgba(59,130,246,0.12)',ret:'7-7.5%',risk:'None',liq:'Low'},{n:'Nifty 50 Index SIP',pct:20,icon:'📈',bg:'rgba(200,240,60,0.12)',ret:'10-12%',risk:'Moderate',liq:'High'},{n:'Sovereign Gold Bond',pct:15,icon:'🥇',bg:'rgba(245,158,11,0.12)',ret:'7-9%',risk:'Low',liq:'Low'}],
+    reason:['Stability focused','Capital protection priority','Tax-free government schemes']
+  },
+  moderate:{
+    alloc:[{n:'Emergency Liquid Fund',pct:25,icon:'🆘',bg:'rgba(34,197,94,0.12)',ret:'5-7%',risk:'Very Low',liq:'High'},{n:'PPF (Tax Saving)',pct:20,icon:'🏛️',bg:'rgba(59,130,246,0.12)',ret:'7-7.5%',risk:'None',liq:'Low'},{n:'Nifty 50 SIP',pct:30,icon:'📈',bg:'rgba(200,240,60,0.12)',ret:'10-12%',risk:'Moderate',liq:'High'},{n:'ELSS Mutual Fund',pct:15,icon:'💹',bg:'rgba(168,85,247,0.12)',ret:'12-15%',risk:'Moderate-High',liq:'Medium'},{n:'Fixed Deposit',pct:10,icon:'🏦',bg:'rgba(245,158,11,0.12)',ret:'6.5-7.5%',risk:'Low',liq:'Medium'}],
+    reason:['Balanced growth + safety','Tax savings via 80C','Long-term wealth building']
+  },
+  aggressive:{
+    alloc:[{n:'Emergency Fund',pct:15,icon:'🆘',bg:'rgba(34,197,94,0.12)',ret:'5-7%',risk:'Very Low',liq:'High'},{n:'Small/Mid Cap SIP',pct:35,icon:'🚀',bg:'rgba(239,68,68,0.12)',ret:'14-18%',risk:'High',liq:'High'},{n:'ELSS Tax Saver',pct:20,icon:'💹',bg:'rgba(200,240,60,0.12)',ret:'12-16%',risk:'Moderate',liq:'Medium'},{n:'International Funds',pct:15,icon:'🌍',bg:'rgba(59,130,246,0.12)',ret:'10-15%',risk:'High',liq:'High'},{n:'Nifty 50 Index',pct:15,icon:'📈',bg:'rgba(168,85,247,0.12)',ret:'10-12%',risk:'Moderate',liq:'High'}],
+    reason:['Maximum growth focus','High risk tolerance','Long-term wealth creation']
+  }
+};
+
+function setRisk(profile,el){
+  riskProfile=profile;
+  document.querySelectorAll('.rp-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  calcInvest();
+}
+
+function fmt(n){if(n>=10000000)return '₹'+(n/10000000).toFixed(2)+'Cr';if(n>=100000)return '₹'+(n/100000).toFixed(1)+'L';if(n>=1000)return '₹'+(n/1000).toFixed(0)+'K';return '₹'+Math.round(n);}
+
+function calcInvest(){
+  const income=+document.getElementById('i-income').value||0;
+  const savings=+document.getElementById('i-savings').value||0;
+  const horizon=+document.getElementById('i-horizon').value||7;
+  const profile=INVESTMENTS[riskProfile];
+  const alloc=profile.alloc;
+
+  document.getElementById('donutTotal').textContent=fmt(savings);
+
+  // Donut
+  const r=80,cx=100,cy=100,circ=2*Math.PI*r;
+  let offset=0;
+  const paths=alloc.map((a,i)=>{
+    const dash=(a.pct/100)*circ;
+    const path=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${COLORS[i]}" stroke-width="28" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" stroke-linecap="butt"/>`;
+    offset+=dash;
+    return path;
+  }).join('');
+  document.getElementById('donutSvg').innerHTML=paths;
+
+  // Legend
+  document.getElementById('legend').innerHTML=alloc.map((a,i)=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${COLORS[i]}"></div>
+      <span>${a.n}</span>
+      <span style="margin-left:auto;font-family:'Syne',sans-serif;font-weight:700;color:${COLORS[i]}">${a.pct}%</span>
+    </div>`).join('');
+
+  // Investment cards
+  const priorities=['inv-p1','inv-p2','inv-p3','inv-p4','inv-p4','inv-p4'];
+  const pNames=['#1 Priority','#2 Priority','#3 Priority','#4 Allocation','#5 Allocation','#6 Allocation'];
+  document.getElementById('invGrid').innerHTML=alloc.map((a,i)=>{
+    const amt=Math.round(savings*(a.pct/100));
+    return `<div class="inv-card ${i===0?'priority-1':''}">
+      <div class="inv-header">
+        <div class="inv-icon" style="background:${a.bg}">${a.icon}</div>
+        <div class="inv-priority ${priorities[i]}">${pNames[i]}</div>
+      </div>
+      <div class="inv-name">${a.n}</div>
+      <div class="inv-stats">
+        <div class="inv-stat"><div class="is-label">Expected Return</div><div class="is-val" style="color:var(--green)">${a.ret}</div></div>
+        <div class="inv-stat"><div class="is-label">Risk Level</div><div class="is-val">${a.risk}</div></div>
+        <div class="inv-stat"><div class="is-label">Liquidity</div><div class="is-val">${a.liq}</div></div>
+        <div class="inv-stat"><div class="is-label">Allocation</div><div class="is-val" style="color:${COLORS[i]}">${a.pct}%</div></div>
+      </div>
+      <div class="inv-amount">
+        <div class="amt-val">${fmt(amt)}<span style="font-size:0.7rem;color:rgba(0,0,0,0.5)">/mo</span></div>
+        <div class="amt-label">Suggested monthly investment</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Projection (SIP with 11% avg annual return for moderate)
+  const rates={conservative:0.08,moderate:0.11,aggressive:0.14};
+  const annualRate=rates[riskProfile];
+  const monthlyRate=annualRate/12;
+  const years=[1,3,5,horizon];
+  const maxVal=savings*((Math.pow(1+monthlyRate,years[years.length-1]*12)-1)/monthlyRate);
+
+  document.getElementById('projGrid').innerHTML=years.map(y=>{
+    const months=y*12;
+    const fv=savings*((Math.pow(1+monthlyRate,months)-1)/monthlyRate);
+    const invested=savings*months;
+    const pct=(fv/maxVal)*100;
+    return `<div class="proj-item">
+      <div class="proj-year">${y} Year${y>1?'s':''}</div>
+      <div class="proj-val">${fmt(fv)}</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:3px;">Invested: ${fmt(invested)}</div>
+      <div style="font-size:0.72rem;color:var(--green);margin-top:2px;">Gain: ${fmt(fv-invested)}</div>
+      <div class="proj-bar"><div class="proj-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+calcInvest();
+</script>
+</body>
+</html>

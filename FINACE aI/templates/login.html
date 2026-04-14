@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceAI — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --black:#080808;--white:#f5f3ef;--gray:#1a1a1a;
+  --mid:#2e2e2e;--accent:#c8f03c;--text-muted:#888;
+  --border:#252525;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;overflow:hidden;}
+
+/* Noise overlay */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:100;opacity:0.4;}
+
+.layout{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+
+/* LEFT PANEL */
+.left{background:var(--white);color:var(--black);padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
+.left::after{content:'';position:absolute;bottom:-120px;left:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(200,240,60,0.3) 0%,transparent 70%);pointer-events:none;}
+
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-dot{width:36px;height:36px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-0.02em;}
+
+.left-content{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 0;}
+.left-headline{font-family:'Syne',sans-serif;font-size:3.2rem;font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:20px;}
+.left-headline span{display:block;}
+.left-headline .accent{color:transparent;-webkit-text-stroke:2px var(--black);}
+.left-sub{font-size:0.95rem;color:#555;max-width:320px;line-height:1.7;}
+
+.stats-row{display:flex;gap:24px;margin-top:40px;}
+.stat-card{background:var(--black);color:var(--white);padding:20px 24px;border-radius:16px;flex:1;}
+.stat-card .val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700;}
+.stat-card .lbl{font-size:0.72rem;color:#999;margin-top:4px;text-transform:uppercase;letter-spacing:0.06em;}
+
+.ticker{display:flex;gap:8px;align-items:center;margin-top:32px;padding:12px 16px;border:1px solid #ddd;border-radius:40px;width:fit-content;font-size:0.82rem;color:#555;}
+.ticker-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* RIGHT PANEL */
+.right{background:var(--black);padding:48px;display:flex;flex-direction:column;justify-content:center;}
+
+.tab-switch{display:flex;background:var(--gray);border-radius:12px;padding:4px;margin-bottom:40px;width:fit-content;}
+.tab{padding:10px 28px;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;font-size:0.85rem;transition:all 0.25s;color:var(--text-muted);}
+.tab.active{background:var(--white);color:var(--black);}
+
+.form-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:8px;letter-spacing:-0.02em;}
+.form-sub{color:var(--text-muted);font-size:0.88rem;margin-bottom:32px;}
+
+.form-group{margin-bottom:20px;}
+.form-group label{display:block;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;}
+.form-group input{width:100%;background:var(--gray);border:1px solid var(--border);color:var(--white);padding:14px 16px;border-radius:12px;font-size:0.92rem;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+.form-group input:focus{outline:none;border-color:var(--accent);}
+.form-group input::placeholder{color:#444;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+.btn-primary{width:100%;background:var(--accent);color:var(--black);border:none;padding:16px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s;margin-top:8px;letter-spacing:-0.01em;}
+.btn-primary:hover{background:#d4f54a;transform:translateY(-1px);}
+
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--text-muted);font-size:0.82rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.social-btn{width:100%;background:var(--gray);border:1px solid var(--border);color:var(--white);padding:13px;border-radius:12px;font-size:0.88rem;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.social-btn:hover{border-color:#555;}
+
+.form-footer{text-align:center;margin-top:20px;font-size:0.83rem;color:var(--text-muted);}
+.form-footer a{color:var(--accent);text-decoration:none;font-weight:500;}
+
+/* Panel switching */
+.panel{display:none;}
+.panel.active{display:block;}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr;}
+  .left{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="brand">
+      <div class="brand-dot">💰</div>
+      <span class="brand-name">FinanceAI</span>
+    </div>
+    <div class="left-content">
+      <div class="left-headline">
+        <span>Achieve your</span>
+        <span>Financial</span>
+        <span class="accent">Goals.</span>
+      </div>
+      <p class="left-sub">AI-powered financial advisor that helps you monitor spending, plan investments, and reach financial freedom.</p>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="val">₹3.8L</div>
+          <div class="lbl">Avg. Savings</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">94%</div>
+          <div class="lbl">Accuracy</div>
+        </div>
+      </div>
+      <div class="ticker">
+        <span class="ticker-dot"></span>
+        AI Model Active — Llama3 Local
+      </div>
+    </div>
+    <div style="font-size:0.75rem;color:#999;">© 2025 FinanceAI. All rights reserved.</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div>
+      <div class="tab-switch">
+        <div class="tab active" onclick="showPanel('login',this)">Log In</div>
+        <div class="tab" onclick="showPanel('signup',this)">Sign Up</div>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="panel active" id="panel-login">
+        <div class="form-title">Welcome back</div>
+        <div class="form-sub">Sign in to your FinanceAI account</div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••"/>
+        </div>
+        <div style="text-align:right;margin-bottom:24px;">
+          <a href="#" style="font-size:0.82rem;color:var(--accent);text-decoration:none;">Forgot password?</a>
+        </div>
+        <button class="btn-primary" onclick="window.location.href='/home'">Continue →</button>
+        <div class="divider">or continue with</div>
+        <button class="social-btn">🔵 Continue with Google</button>
+        <div class="form-footer">Don't have an account? <a href="#" onclick="showPanelByName('signup')">Sign up free</a></div>
+      </div>
+
+      <!-- SIGNUP -->
+      <div class="panel" id="panel-signup">
+        <div class="form-title">Create account</div>
+        <div class="form-sub">Start your financial journey today</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" placeholder="Kumar"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" placeholder="Singh"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="you@example.com"/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Create a strong password"/>
+        </div>
+        <div class="form-group">
+          <label>Monthly Income (₹)</label>
+          <input type="number" placeholder="50000"/>
+        </div>
+        <button class="btn-primary" onclick="window.location.href='/home'">Create Account →</button>
+        <div class="form-footer">Already have an account? <a href="#" onclick="showPanelByName('login')">Log in</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPanel(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  el.classList.add('active');
+}
+function showPanelByName(name) {
+  const tabs = document.querySelectorAll('.tab');
+  const idx = name === 'login' ? 0 : 1;
+  showPanel(name, tabs[idx]);
+}
+</script>
+</body>
+</html>

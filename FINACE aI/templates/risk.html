@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinanceAI — Risk Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#080808;--white:#f5f3ef;--surface:#161616;--surface2:#1e1e1e;--accent:#c8f03c;--muted:#777;--border:#222;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--orange:#f97316;}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--white);min-height:100vh;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+.topbar{background:rgba(8,8,8,0.97);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:50;}
+.back-btn{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;text-decoration:none;transition:all 0.2s;}
+.back-btn:hover{border-color:#555;color:var(--white);}
+.page-icon{width:32px;height:32px;background:rgba(239,68,68,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+.page-sub{font-size:0.78rem;color:var(--muted);margin-left:4px;}
+
+.container{max-width:1100px;margin:0 auto;padding:40px 32px;}
+.ph-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:8px;}
+.ph-title{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
+.ph-sub{color:var(--muted);font-size:0.9rem;margin-bottom:36px;}
+
+.main-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:24px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:20px;}
+.ig{margin-bottom:16px;}
+.ig label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;}
+.ig input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--white);padding:12px 14px;border-radius:10px;font-size:0.88rem;font-family:'DM Sans',sans-serif;transition:border-color 0.2s;}
+.ig input:focus{outline:none;border-color:var(--accent);}
+.ig-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-calc{width:100%;background:var(--red);color:var(--white);border:none;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;margin-top:8px;transition:all 0.2s;}
+.btn-calc:hover{background:#dc2626;transform:translateY(-1px);}
+
+/* RISK METER */
+.risk-meter{text-align:center;padding:16px 0 24px;}
+.meter-wrap{width:200px;height:100px;margin:0 auto 16px;position:relative;overflow:hidden;}
+.meter-wrap svg{position:absolute;top:0;left:0;}
+.meter-label{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:4px;}
+.meter-sub{font-size:0.82rem;color:var(--muted);}
+.score-num-large{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;line-height:1;margin:8px 0;}
+
+/* RISK CARDS */
+.risk-items{display:flex;flex-direction:column;gap:12px;margin-top:16px;}
+.risk-item{border-radius:12px;padding:16px;border-left:4px solid;}
+.risk-item.critical{background:rgba(239,68,68,0.08);border-color:var(--red);}
+.risk-item.high{background:rgba(249,115,22,0.08);border-color:var(--orange);}
+.risk-item.moderate{background:rgba(245,158,11,0.08);border-color:var(--yellow);}
+.risk-item.safe{background:rgba(34,197,94,0.08);border-color:var(--green);}
+.ri-type{font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;margin-bottom:4px;}
+.ri-detail{font-size:0.8rem;color:#ccc;margin-bottom:6px;}
+.ri-action{font-size:0.78rem;font-weight:500;}
+.risk-item.critical .ri-action{color:var(--red);}
+.risk-item.high .ri-action{color:var(--orange);}
+.risk-item.moderate .ri-action{color:var(--yellow);}
+.risk-item.safe .ri-action{color:var(--green);}
+
+/* SUMMARY STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;}
+.stat-box{background:var(--surface2);border-radius:12px;padding:14px;}
+.stat-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:5px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;}
+
+/* PRIORITY ACTIONS */
+.actions-card{margin-top:24px;grid-column:1/-1;}
+.action-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.action-item:last-child{border:none;}
+.action-num{width:28px;height:28px;border-radius:50%;background:var(--red);color:var(--white);font-family:'Syne',sans-serif;font-weight:800;font-size:0.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.action-text{font-size:0.86rem;line-height:1.6;}
+.no-risk{text-align:center;padding:40px;color:var(--green);}
+.no-risk .nr-icon{font-size:3rem;margin-bottom:12px;}
+.no-risk h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:6px;}
+.no-risk p{font-size:0.85rem;color:var(--muted);}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr;}.ig-row{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.actions-card{grid-column:1;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back-btn" href="/home">← Back</a>
+  <div class="page-icon">⚠️</div>
+  <span class="page-title">Financial Risk Analysis</span>
+  <span class="page-sub">— powered by risk_engine.py</span>
+</div>
+
+<div class="container">
+  <div class="ph-label">Risk Detection</div>
+  <div class="ph-title">Financial Crisis Warning System</div>
+  <div class="ph-sub">Identify debt traps, crisis signals, and vulnerabilities before they hurt you</div>
+
+  <div class="main-grid">
+    <!-- FORM -->
+    <div class="card">
+      <div class="card-title">⚠️ Enter Your Financial Data</div>
+      <div class="ig"><label>Monthly Income (₹) *</label><input type="number" id="r-income" placeholder="50000" value="50000"/></div>
+      <div class="ig-row">
+        <div class="ig"><label>Total Monthly EMIs (₹)</label><input type="number" id="r-emis" placeholder="20000" value="20000"/></div>
+        <div class="ig"><label>Monthly Savings (₹)</label><input type="number" id="r-savings" placeholder="5000" value="5000"/></div>
+      </div>
+      <div class="ig-row">
+        <div class="ig"><label>Monthly Expenses (₹)</label><input type="number" id="r-expenses" placeholder="20000" value="20000"/></div>
+        <div class="ig"><label>Credit Card Debt (₹)</label><input type="number" id="r-ccdebt" placeholder="0" value="0"/></div>
+      </div>
+      <div class="ig"><label>Emergency Fund Available (₹)</label><input type="number" id="r-emergency" placeholder="30000" value="30000"/></div>
+      <div class="ig"><label>Number of Active Loans</label><input type="number" id="r-loans" placeholder="2" value="2" min="0"/></div>
+      <button class="btn-calc" onclick="calcRisk()">🚨 Analyze My Financial Risk</button>
+    </div>
+
+    <!-- RESULT -->
+    <div>
+      <div class="card">
+        <div class="card-title">📊 Risk Assessment Result</div>
+        <div class="risk-meter">
+          <div class="score-num-large" id="riskScore" style="color:var(--muted)">—</div>
+          <div class="meter-label" id="riskLabel">Enter your data</div>
+          <div class="meter-sub" id="riskSub">Click Analyze to detect financial risks</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-label">DTI Ratio</div><div class="stat-val" id="s-dti">—</div></div>
+          <div class="stat-box"><div class="stat-label">Savings Rate</div><div class="stat-val" id="s-sr">—</div></div>
+          <div class="stat-box"><div class="stat-label">Emergency Fund</div><div class="stat-val" id="s-ef">—</div></div>
+        </div>
+        <div class="risk-items" id="riskItems">
+          <div style="text-align:center;padding:24px;color:var(--muted);font-size:0.85rem;">Risk signals will appear here after analysis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIORITY ACTIONS -->
+    <div class="card actions-card">
+      <div class="card-title">🎯 Priority Actions</div>
+      <div id="actionsContainer">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Run analysis to get personalized priority actions</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function calcRisk(){
+  const income=+document.getElementById('r-income').value||0;
+  const emis=+document.getElementById('r-emis').value||0;
+  const savings=+document.getElementById('r-savings').value||0;
+  const expenses=+document.getElementById('r-expenses').value||0;
+  const ccDebt=+document.getElementById('r-ccdebt').value||0;
+  const emergency=+document.getElementById('r-emergency').value||0;
+  const loans=+document.getElementById('r-loans').value||0;
+
+  if(income<=0){alert('Please enter your monthly income');return;}
+
+  const dti=income>0?(emis/income)*100:0;
+  const sr=income>0?(savings/income)*100:0;
+  const efMonths=expenses>0?emergency/expenses:0;
+  const totalOut=emis+expenses;
+
+  let riskScore=0;
+  const risks=[];
+  const safeSignals=[];
+
+  // Risk checks
+  if(dti>60){risks.push({sev:'critical',type:'🔴 DEBT TRAP',detail:`EMIs consume ${dti.toFixed(0)}% of income — you are in a debt trap.`,action:'Stop all new borrowing. Seek debt consolidation immediately.'});riskScore+=40;}
+  else if(dti>50){risks.push({sev:'high',type:'🟠 HIGH DEBT BURDEN',detail:`DTI of ${dti.toFixed(0)}% is dangerously high.`,action:'Avoid new loans. Focus on prepaying highest interest debt.'});riskScore+=25;}
+  else if(dti>40){risks.push({sev:'moderate',type:'🟡 ELEVATED DEBT',detail:`DTI of ${dti.toFixed(0)}% is above the safe 30-40% threshold.`,action:'Limit spending. Do not take new loans until DTI falls below 35%.'});riskScore+=15;}
+  else safeSignals.push('✅ Debt-to-income ratio is within safe limits');
+
+  if(sr<0){risks.push({sev:'critical',type:'🔴 DISSAVING',detail:'You are spending more than you earn every month.',action:'Create emergency budget. Cut non-essential expenses immediately.'});riskScore+=35;}
+  else if(sr<5){risks.push({sev:'high',type:'🟠 INSUFFICIENT SAVINGS',detail:`Savings rate of ${sr.toFixed(0)}% leaves you exposed to emergencies.`,action:'Target saving at least ₹${Math.round(income*0.1).toLocaleString()} (10%) per month.'});riskScore+=20;}
+  else if(sr>20)safeSignals.push('✅ Strong savings habit — above 20%');
+
+  if(efMonths<3){risks.push({sev:'high',type:'🟠 NO EMERGENCY BUFFER',detail:`Only ${efMonths.toFixed(1)} months of expenses saved. Need at least 6 months.`,action:`Build emergency fund to ₹${Math.round(expenses*6).toLocaleString()} (6 months of expenses).`});riskScore+=15;}
+  else if(efMonths>=6)safeSignals.push('✅ Emergency fund covers 6+ months — excellent buffer');
+
+  if(ccDebt>income*3){risks.push({sev:'critical',type:'🔴 CREDIT CARD SPIRAL',detail:'Credit card debt exceeds 3× monthly income at 36-40% interest.',action:'Pay minimum + extra every month. Stop using credit cards until cleared.'});riskScore+=30;}
+
+  if(totalOut>income){risks.push({sev:'critical',type:'🔴 NEGATIVE CASH FLOW',detail:'Total outflows exceed income. You accumulate debt every month.',action:'Immediate financial restructuring required. Seek financial counseling.'});riskScore+=30;}
+
+  if(loans>3){risks.push({sev:'moderate',type:'🟡 TOO MANY LOANS',detail:`${loans} active loans increases administrative complexity and risk.`,action:'Consolidate smaller loans into one to simplify repayment.'});riskScore+=10;}
+
+  riskScore=Math.min(100,riskScore);
+
+  // Color and label
+  let color,label,sub;
+  if(riskScore===0){color='var(--green)';label='Financially Stable 🟢';sub='No significant risk factors detected. Keep it up!';}
+  else if(riskScore<20){color='var(--accent)';label='Minor Risks 🟡';sub='Small issues detected. Take action before they grow.';}
+  else if(riskScore<50){color='var(--yellow)';label='Significant Risk 🟠';sub='Multiple risk factors. Take corrective action now.';}
+  else if(riskScore<75){color='var(--orange)';label='High Risk 🔴';sub='Serious financial vulnerabilities. Act urgently.';}
+  else{color='var(--red)';label='Financial Crisis ⛔';sub='Critical situation. Seek professional financial advice immediately.';}
+
+  document.getElementById('riskScore').textContent=riskScore+'/100';
+  document.getElementById('riskScore').style.color=color;
+  document.getElementById('riskLabel').textContent=label;
+  document.getElementById('riskSub').textContent=sub;
+  document.getElementById('s-dti').textContent=dti.toFixed(1)+'%';
+  document.getElementById('s-dti').style.color=dti>50?'var(--red)':dti>35?'var(--yellow)':'var(--green)';
+  document.getElementById('s-sr').textContent=sr.toFixed(1)+'%';
+  document.getElementById('s-sr').style.color=sr<5?'var(--red)':sr<15?'var(--yellow)':'var(--green)';
+  document.getElementById('s-ef').textContent=efMonths.toFixed(1)+' mo';
+  document.getElementById('s-ef').style.color=efMonths<3?'var(--red)':efMonths<6?'var(--yellow)':'var(--green)';
+
+  // Render risk items
+  const all=[...risks,...safeSignals.map(s=>({sev:'safe',type:s,detail:'',action:''}))];
+  if(all.length===0){
+    document.getElementById('riskItems').innerHTML=`<div class="no-risk"><div class="nr-icon">🎉</div><h3>No Risks Detected!</h3><p>Your financial profile looks healthy. Keep maintaining good habits.</p></div>`;
+  }else{
+    document.getElementById('riskItems').innerHTML=all.map(r=>`
+      <div class="risk-item ${r.sev}">
+        <div class="ri-type">${r.type}</div>
+        ${r.detail?`<div class="ri-detail">${r.detail}</div>`:''}
+        ${r.action?`<div class="ri-action">→ ${r.action}</div>`:''}
+      </div>`).join('');
+  }
+
+  // Priority actions
+  const criticalActions=risks.filter(r=>r.sev==='critical'||r.sev==='high').map(r=>r.action);
+  if(criticalActions.length===0){
+    document.getElementById('actionsContainer').innerHTML=`<div style="text-align:center;padding:20px;color:var(--green);font-size:0.88rem;">✅ No urgent actions needed. Focus on maintaining your good habits.</div>`;
+  }else{
+    document.getElementById('actionsContainer').innerHTML=criticalActions.slice(0,5).map((a,i)=>`
+      <div class="action-item">
+        <div class="action-num">${i+1}</div>
+        <div class="action-text">${a}</div>
+      </div>`).join('');
+  }
+}
+</script>
+</body>
+</html>
